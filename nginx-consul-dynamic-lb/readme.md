@@ -12,18 +12,6 @@ This project demonstrates a simple service discovery and load balancing setup us
 - **Load Balancing**: Nginx distributes traffic to healthy services
 - **DNS-based Discovery**: Nginx uses Consul's DNS interface
 
-
-## Running the Project
-
-1. Start the infrastructure:
-   ```bash
-   docker-compose up -d
-   ```
-
-2. Access the services:
-   - Main service via nginx: http://localhost
-   - Consul UI: http://localhost:8500
-
 ## How It Works
 
 1. **Service Registration**:
@@ -54,7 +42,9 @@ This project demonstrates a simple service discovery and load balancing setup us
 - download consul-template
 - go mod tidy
 - go mod vendor
-- docker-compose up --build
+- docker-compose up -d
+- Main service via nginx: http://localhost
+- Consul UI: http://localhost:8500
 - run command ->   consul-template -config=./nginx/consul-template.hcl -> in background
 - stop some server
 - and see updated nginx
