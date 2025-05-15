@@ -49,19 +49,6 @@ services:
     depends_on:
       - consul
 
-#  nginx:
-#    image: nginx:1.21
-#    ports:
-#      - "80:80"
-#    volumes:
-#      - ./nginx/nginx_without_consul_rr.conf:/etc/nginx/nginx_without_consul_rr.conf:ro
-#    networks:
-#      - app-network
-#    depends_on:
-#      - service1
-#      - service2
-#      - service3
-
   nginx:
     image: nginx:1.21
     ports:
@@ -72,33 +59,6 @@ services:
       - app-network
     depends_on:
       - consul
-
-#  consul-template:
-#    build:
-#      context: .
-#      dockerfile: consul-template.Dockerfile
-#    user: root
-#    volumes:
-#      - ./nginx/consul-template.hcl:/etc/consul-template/consul-template.hcl
-#      - ./nginx/templates:/etc/consul-template/templates
-#      - nginx_config:/etc/nginx
-#    pid: "host"
-#    command: "-config=/etc/consul-template/consul-template.hcl"
-#    networks:
-#      - app-network
-#    depends_on:
-#      - nginx
-#      - consul
-
-#  nginx:
-#    image: nginx:latest
-#    container_name: nginx
-#    depends_on:
-#      - consul
-#    ports:
-#      - "80:80"
-#    networks:
-#      - app-network
 
 networks:
   app-network:

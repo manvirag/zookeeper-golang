@@ -24,11 +24,9 @@ type Service struct {
 }
 
 func NewService(consulHost string, serverId string, port int) (*Service, error) {
-	// Create Consul client config
 	config := consulapi.DefaultConfig()
 	config.Address = consulHost
 
-	// Create Consul client
 	client, err := consulapi.NewClient(config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Consul client: %v", err)
@@ -85,18 +83,15 @@ func (s *Service) setupRoutes() {
 func (s *Service) Start() error {
 	s.setupRoutes()
 
-	// Get service name from environment variable
 	serviceName := os.Getenv("SERVICE_NAME")
 	if serviceName == "" {
 		serviceName = "my-service"
 	}
 
-	// Register service with Consul
 	if err := s.registerService(serviceName); err != nil {
 		return err
 	}
 
-	// Start HTTP server
 	go func() {
 		logger.Infof("Starting service on port %d", s.port)
 		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -120,7 +115,6 @@ func (s *Service) Stop() error {
 }
 
 func main() {
-	// Get configuration from environment variables
 	port := 8080
 	if portStr := os.Getenv("SERVICE_PORT"); portStr != "" {
 		fmt.Sscanf(portStr, "%d", &port)
@@ -146,7 +140,6 @@ func main() {
 		logger.Fatalf("Failed to start service: %v", err)
 	}
 
-	// Wait for interrupt signal
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
