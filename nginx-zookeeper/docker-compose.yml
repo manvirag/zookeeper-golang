@@ -1,0 +1,106 @@
+version: '3'
+
+services:
+  consul:
+    image: consul:1.15
+    ports:
+      - "8500:8500"  # HTTP API
+      - "8600:8600/udp"  # DNS
+    command: agent -dev -client=0.0.0.0
+    networks:
+      - app-network
+
+  service1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERVICE_NAME=backend
+      - SERVICE_PORT=8080
+      - SERVER_ID=service1
+    networks:
+      - app-network
+    depends_on:
+      - consul
+
+  service2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERVICE_NAME=backend
+      - SERVER_ID=service2
+      - SERVICE_PORT=8081
+    networks:
+      - app-network
+    depends_on:
+      - consul
+
+  service3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERVICE_NAME=backend
+      - SERVICE_PORT=8082
+      - SERVER_ID=service3
+    networks:
+      - app-network
+    depends_on:
+      - consul
+
+#  nginx:
+#    image: nginx:1.21
+#    ports:
+#      - "80:80"
+#    volumes:
+#      - ./nginx/nginx_without_consul_rr.conf:/etc/nginx/nginx_without_consul_rr.conf:ro
+#    networks:
+#      - app-network
+#    depends_on:
+#      - service1
+#      - service2
+#      - service3
+
+  nginx:
+    image: nginx:1.21
+    ports:
+      - "80:80"
+    volumes:
+      - nginx_config:/etc/nginx
+    networks:
+      - app-network
+    depends_on:
+      - consul
+
+  consul-template:
+    image: hashicorp/consul-template:0.30.0
+    user: root
+    volumes:
+      - ./nginx/consul-template.hcl:/etc/consul-template/consul-template.hcl
+      - ./nginx/templates:/etc/consul-template/templates
+      - nginx_config:/etc/nginx
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: "-config=/etc/consul-template/consul-template.hcl"
+    networks:
+      - app-network
+    depends_on:
+      - nginx
+      - consul
+
+#  nginx:
+#    image: nginx:latest
+#    container_name: nginx
+#    depends_on:
+#      - consul
+#    ports:
+#      - "80:80"
+#    networks:
+#      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  nginx_config:
