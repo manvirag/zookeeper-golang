@@ -50,3 +50,4 @@ This project demonstrates a simple service discovery and load balancing setup us
 - and see updated nginx
 
 
+![img.png](img.png)
