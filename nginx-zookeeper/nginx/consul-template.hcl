@@ -1,5 +1,5 @@
 consul {
-  address = "consul:8500"
+  address = "localhost:8500"
 
   retry {
     enabled  = true
@@ -9,8 +9,8 @@ consul {
 }
 
 template {
-  source      = "/etc/consul-template/templates/load-balancer.conf.ctmpl"
-  destination = "/etc/nginx/nginx.conf"
+  source      = "./nginx/templates/load-balancer.conf.ctmpl"
+  destination = "./nginx/nginx.conf"
   perms       = 0644
   command     = "docker exec nginx-zookeeper-nginx-1 nginx -s reload"
 }

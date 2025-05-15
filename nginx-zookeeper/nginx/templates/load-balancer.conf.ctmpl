@@ -1,13 +1,31 @@
-upstream backend {
-{{- range service "backend" }}
-  server {{ .Address }}:{{ .Port }};
-{{- end }}
+events {
+    worker_connections 1024;
 }
 
-server {
-   listen 80;
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
 
-   location / {
-      proxy_pass http://backend;
-   }
+    upstream backend {
+    {{- with service "backend" }}
+      {{- range . }}
+        server {{ .Address }}:{{ .Port }};
+      {{- end }}
+    {{- else }}
+        server 127.0.0.1:65535;  # fallback, always fails
+    {{- end }}
+    }
+
+    server {
+        listen 80;
+
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+
+        location / {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
 }
